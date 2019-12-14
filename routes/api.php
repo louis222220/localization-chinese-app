@@ -23,3 +23,4 @@ Route::post('/doc', 'DocController@uploadDocElement');
 
 Route::get('/doc/reFreshMDFromDoc', 'DocController@reFreshMDFromDoc');
 
+Route::get('/tmp/reg', 'DocController@tmp');

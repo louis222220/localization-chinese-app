@@ -34,7 +34,9 @@ class DocController extends Controller
 
         $newUploadDocElement = new UploadDocElement($validatedData);
         $newUploadDocElement->save();
-        return response(201);
+        return response()->json([
+            'message' => '成功上傳翻譯'
+        ], 201);
     }
 
 
@@ -71,14 +73,14 @@ class DocController extends Controller
     protected function refreshDocElements($markdownValue)
     {
         OriginDocElement::truncate();
+        UploadDocElement::truncate();
 
         $pieces = $this->splitMarkDown($markdownValue);
 
         foreach($pieces as $piece){
-            $newOriginDocElement = new OriginDocElement([
-                'value' => $piece,
-                'font_size' => 3
-            ]);
+            $newOriginDocElementData = $this->isHeading($piece);
+            
+            $newOriginDocElement = new OriginDocElement( $newOriginDocElementData );
             $newOriginDocElement->save();
         }        
     }
@@ -90,4 +92,43 @@ class DocController extends Controller
         return $pieces;
     }
 
+
+    protected function isHeading($text)
+    {
+        $header1Pattern = '/^#\s([\w\s]*)/';    // "# Some heading1"
+        $header2Pattern = '/^##\s([\w\s]*)/';   // "## Some heading2"
+
+        preg_match($header1Pattern, $text, $matches);
+        if (count($matches)){
+            return [
+                'value' => $matches[1],
+                'font_size' => 1
+            ];
+        }
+        
+        preg_match($header2Pattern, $text, $matches);
+        if (count($matches)){
+            return [
+                'value' => $matches[1],
+                'font_size' => 2
+            ];
+        }
+
+        return [
+            'value' => $text,
+            'font_size' => 3
+        ];
+
+    }
+
+
+    public function tmp()
+    {
+        $str = "## Functions";
+        $pattern1 = '/^#\s([\w\s]*)/';
+        // $pattern = '/[#]*/';
+
+        preg_match($pattern1, $str, $matches);
+        return $matches;
+    }
 }
