@@ -19,8 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 Route::get('/doc', 'DocController@getNowDocElements');
-
-Route::get('/doc/new', 'DocController@NewgetNowDocElements');
+Route::post('/doc', 'DocController@uploadDocElement');
 
 Route::get('/doc/reFreshMDFromDoc', 'DocController@reFreshMDFromDoc');
 

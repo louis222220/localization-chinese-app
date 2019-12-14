@@ -21,6 +21,23 @@ class DocController extends Controller
     }
 
 
+    public function uploadDocElement(Request $request)
+    {
+        $validatedData = $request->validate([
+            'origin_element_id' => [
+                'required',
+                'integer',
+                'exists:origin_doc_elements,id'
+            ],
+            'value' => ['required', 'string'],
+        ]);
+
+        $newUploadDocElement = new UploadDocElement($validatedData);
+        $newUploadDocElement->save();
+        return response(201);
+    }
+
+
     public function reFreshMDFromDoc(Request $request){
         $url = "https://raw.githubusercontent.com/JetBrains/kotlin-web-site/master/pages/docs/reference/basic-syntax.md";
         

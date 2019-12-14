@@ -44,7 +44,9 @@ class OriginDocElement extends Model
 
     public function getNowValueAttribute()
     {
-        $lastUploadDocElement = UploadDocElement::latest('id')->first();
+        $lastUploadDocElement = UploadDocElement::latest('id')
+                                    ->where('origin_element_id',$this->id)
+                                    ->first();
         if ($lastUploadDocElement){
             return $lastUploadDocElement->value;
         }
