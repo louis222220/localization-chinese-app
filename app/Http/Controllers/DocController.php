@@ -54,8 +54,8 @@ class DocController extends Controller
         try {
             $res = (string) $client->get($url, $headers)
                                 ->getBody();
-            
-            $this->refreshDocElements($res);
+            $resWithoutTag = strip_tags($res);
+            $this->refreshDocElements($resWithoutTag);
 
         
             // $my_html = Markdown::defaultTransform($res);
@@ -79,10 +79,13 @@ class DocController extends Controller
 
         foreach($pieces as $piece){
             $newOriginDocElementData = $this->isHeading($piece);
+            if(! $newOriginDocElementData){
+                continue;
+            }
             
             $newOriginDocElement = new OriginDocElement( $newOriginDocElementData );
             $newOriginDocElement->save();
-        }        
+        }
     }
 
 
@@ -97,6 +100,7 @@ class DocController extends Controller
     {
         $header1Pattern = '/^#\s([\w\s]*)/';    // "# Some heading1"
         $header2Pattern = '/^##\s([\w\s]*)/';   // "## Some heading2"
+        $titleInfoPattern = '/^---/';
 
         preg_match($header1Pattern, $text, $matches);
         if (count($matches)){
@@ -113,6 +117,12 @@ class DocController extends Controller
                 'font_size' => 2
             ];
         }
+        
+        preg_match($titleInfoPattern, $text, $matches);
+        if (count($matches)){
+            return null;
+        }
+        
 
         return [
             'value' => $text,
@@ -124,11 +134,29 @@ class DocController extends Controller
 
     public function tmp()
     {
-        $str = "## Functions";
-        $pattern1 = '/^#\s([\w\s]*)/';
+        $url = "https://raw.githubusercontent.com/JetBrains/kotlin-web-site/master/pages/docs/reference/basic-syntax.md";
+
+        $client = new Client;
+        $headers = [
+            'headers' => [
+                "Connection" => "keep-alive",
+            ],
+        ];
+
+        try {
+            $res = (string) $client->get($url, $headers)
+                                ->getBody();
+        } catch (RequestException $e) {
+            return response(409);
+        }
+        
+        $pieces = $this->splitMarkDown($res);
+        // return $pieces;
+        // $str = "## Functions";
+        $pattern1 = '/^---*/';
         // $pattern = '/[#]*/';
 
-        preg_match($pattern1, $str, $matches);
+        preg_match($pattern1, $pieces[1], $matches);
         return $matches;
     }
 }
