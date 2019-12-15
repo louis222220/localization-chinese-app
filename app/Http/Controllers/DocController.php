@@ -125,6 +125,9 @@ class DocController extends Controller
         if (count($matches)){
             return null;
         }
+        if (! $text){
+            return null;
+        }
         
 
         return [
