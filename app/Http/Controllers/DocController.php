@@ -73,7 +73,7 @@ class DocController extends Controller
     protected function refreshDocElements($markdownValue)
     {
         OriginDocElement::truncate();
-        UploadDocElement::truncate();
+        // UploadDocElement::truncate();
 
         $pieces = $this->splitMarkDown($markdownValue);
 
@@ -92,6 +92,9 @@ class DocController extends Controller
     protected function splitMarkDown($markdownValue)
     {
         $pieces = explode("\n\n", $markdownValue);
+        foreach($pieces as $piece){
+            $piece = trim($piece);
+        }
         return $pieces;
     }
 
